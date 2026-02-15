@@ -1,0 +1,14 @@
+# 忽略配置文件（保护你的 API Key）
+config/config.yaml
+
+# 忽略日志文件
+assets/*.log
+*.log
+
+# 忽略 Python 缓存
+__pycache__/
+*.pyc
+
+# 忽略虚拟环境
+venv/
+.venv/
