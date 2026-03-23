@@ -3,7 +3,6 @@ import base64
 import logging
 import requests
 
-
 def encode_image(image):
     image_io = io.BytesIO()
     logging.debug(f"原始分辨率{image.size}")
@@ -12,14 +11,17 @@ def encode_image(image):
     logging.debug(f"压缩成功后字符串长度：{len(img_str)}")
     return img_str
 
-def call_llm_api(input_text,personal_prompt,image_base64,window_title,model):
-    prompt = f"你是一个通过用户输入和用户目前窗口以及截屏来进行辅助的智能管家，目前用户给予你的人设为：{personal_prompt}，用户目前窗口是:{window_title},请你结合用户截图分析内容并给出回答。"
-
-    text_part = {"type":"text","text":f"{input_text}"}
-    image_part = {"type":"image_url","image_url":{"url":f"data:image/jpeg;base64,{image_base64}"}}
-    msg_system = {"role":"system","content":f"{prompt}"}
+def call_llm_api(memory,input_text,img_b64,window_title,model):
+    text_part = {"type":"text","text":f"用户目前想说的话是：{input_text},用户目前正在使用的窗口是：{window_title}"}
+    image_part = {"type":"image_url","image_url":{"url":f"data:image/jpeg;base64,{img_b64}"}}
     msg_user = {"role":"user","content":[image_part]+[text_part]}
-    payload = {"model":f"{model}","messages":[msg_system,msg_user],"stream":"false","thinking":{"type":"disabled"}}
+    payload = {"model":f"{model}","messages":memory+[msg_user],"stream":"false","thinking":{"type":"disabled"}}
+
+    # text_part = {"type":"text","text":f"{input_text}"}
+    # image_part = {"type":"image_url","image_url":{"url":f"data:image/jpeg;base64,{image_base64}"}}
+    # msg_system = {"role":"system","content":f"{prompt}"}
+    # msg_user = {"role":"user","content":[image_part]+[text_part]}
+    # payload = {"model":f"{model}","messages":[msg_system,msg_user],"stream":"false","thinking":{"type":"disabled"}}
 
     return payload
 

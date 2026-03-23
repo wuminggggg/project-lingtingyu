@@ -1,5 +1,3 @@
-import logging
-
 import mss
 from PIL import Image
 import pygetwindow
