@@ -17,15 +17,18 @@ if os.path.exists(os.path.join(model_path, "conf")):
         print(f"模型已就绪: {model_path}")
 else:
     url = f"https://alphacephei.com/vosk/models/vosk-model-small-cn-0.22.zip"
-    print(f"正在从服务器拉取模型 (约 40MB)...")
-    response = requests.get(url,stream=True)
-    if response.status_code == 200:
-        with open(zip_path, 'wb') as f:
-            for chunk in response.iter_content(chunk_size=8192):
-                f.write(chunk)
-        print("下载完成，准备解压...")
+    if not os.path.exists(zip_path):
+        print(f"正在从服务器拉取模型 (约 40MB)...")
+        response = requests.get(url, stream=True)
+        if response.status_code == 200:
+            with open(zip_path, 'wb') as f:
+                for chunk in response.iter_content(chunk_size=8192):
+                    f.write(chunk)
+            print("下载完成，准备解压...")
+        else:
+            raise Exception(f"下载失败，状态码: {response.status_code}")
     else:
-        raise Exception(f"下载失败，状态码: {response.status_code}")
+        print(f"已找到本地安装包: {zip_path}")
     with zipfile.ZipFile(zip_path, 'r') as zip_ref:
         # 解压到项目根目录
         zip_ref.extractall(base_dir)
@@ -35,7 +38,7 @@ else:
 
 
 #读取模型，开始加载
-model = vosk.Model(r"C:\Users\25226\Desktop\project_lingtingyu\project_lingtingyu\vosk-model-small-cn-0.22")
+model = vosk.Model(fr"{base_dir}\vosk-model-small-cn-0.22")
 rate = 16000
 rec = vosk.KaldiRecognizer(model,rate)
 
